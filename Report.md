@@ -51,13 +51,14 @@ Below we can see that the implementation does indeed solve the problem and does 
 
 ## Future Work
 The following techniques are worth pursuing for faster convergence or higher peak performance:
-    * hyperparameter search
-        * the mini-batch size of 256 slows computations versus a smaller batch size and it is likely unnecessary
-        * the learning rates selected may not be optimal and may result in slower convergence
-    * architecture search
-        * it is possible that a deeper model or adding / removing units in each of the hidden layers may improve performance
-    * prioritized experience replay
-        * replay of states and actions seen to be helpful to convergence may improve performance 
+
+ * hyperparameter search 
+ 	* the mini-batch size of 256 slows computations versus a smaller batch size and it is likely unnecessary
+ 	* the learning rates selected may not be optimal and may result in slower convergence
+ * architecture search
+ 	* it is possible that a deeper model or adding / removing units in each of the hidden layers may improve performance
+ * prioritized experience replay
+ 	* replay of states and actions seen to be helpful to convergence may improve performance 
  
 
 		
