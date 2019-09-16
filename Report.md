@@ -48,7 +48,7 @@ The critic sees the observations of both agents and the actions of both agents. 
 ## Results
 Below we can see that the implementation does indeed solve the problem and does so in 2379 steps.
 ![Episode Scores Plot](output/scores.png  "Episode Scores")
-Additionally, the included training video located in [./output/tennis_training.mp4](trained tennis agents) illustrates the behavior of the trained agents.
+Additionally, [the included trained tennis agent video](output/tennis_training.mp4) illustrates the behavior after training.
 
 ## Future Work
 The following techniques are worth pursuing for faster convergence or higher peak performance:
