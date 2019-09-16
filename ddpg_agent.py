@@ -103,7 +103,7 @@ class DDPGAgent():
         done = dones.index_select(1, agent_id)
      
         # ---------------------------- update critic -------------------------- #
-        #TODO: figure this out
+        # flatten the actions again
         actions_next = torch.cat(all_next_actions, dim=1).to(device)
         with torch.no_grad():
             Q_targets_next = self.critic_target(next_states, actions_next)
