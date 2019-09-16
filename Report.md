@@ -1,5 +1,5 @@
-#Udacity Deep Reinforcement Learning Project 3 Report
-## Competition and Collaboration
+##Udacity Deep Reinforcement Learning Project 3 Report
+#### Competition and Collaboration
 ## Introduction
 This report describes the Competition and Collaboration project results using the Unity Tennis environment. This report demonstrates an implementation of the MADDPG algorithm is able to successfully complete the project requirements.
 
