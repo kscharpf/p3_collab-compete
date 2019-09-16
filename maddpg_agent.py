@@ -51,9 +51,6 @@ class MADDPGAgent():
 
         self.batch_size = batch_size
 
-    def get_noise_scale(self):
-        return self.agents[0].get_noise_scale()
-    
     def step(self, states, actions, rewards, next_states, dones):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Input shapes
@@ -74,9 +71,6 @@ class MADDPGAgent():
             # for each agent, select a unique mini-batch of tuples and then proceed to learn
             experiences = [self.memory.sample() for a in self.agents]
             self.learn(experiences, GAMMA)
-
-    def samples(self):
-        return self.agents[0].samples()
 
     def act(self, state):
         """Returns actions for given state as per current policy."""
@@ -100,7 +94,7 @@ class MADDPGAgent():
             experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
             gamma (float): discount factor
         """
-        all_next_actions = []
+        combined_next_actions = []
         for i, agent in enumerate(self.agents):
             _, _, _, next_states, _ = experiences[i]
             agent_id = torch.tensor([i]).to(device)
@@ -109,9 +103,9 @@ class MADDPGAgent():
             next_state = next_states.reshape(-1, 2, 24).index_select(1, agent_id).squeeze(1)
 
             # run the next state for this agent through the target actor to get the action
-            all_next_actions.append(agent.actor_target(next_state))
+            combined_next_actions.append(agent.actor_target(next_state))
 
-        all_actions = []
+        combined_current_actions = []
         for i, agent in enumerate(self.agents):
             states, _, _, _ , _ = experiences[i]
             agent_id = torch.tensor([i]).to(device)
@@ -119,9 +113,9 @@ class MADDPGAgent():
             # this is done so that each actor is taking action upon its own observation
             state = states.reshape(-1, 2, 24).index_select(1, agent_id).squeeze(1)
             # run the next state for this agent through the target actor to get the action
-            all_actions.append(agent.actor_local(state))
+            combined_current_actions.append(agent.actor_local(state))
         for i, agent in enumerate(self.agents):
-            agent.learn(i, experiences[i], gamma, all_next_actions, all_actions)
+            agent.learn(i, experiences[i], gamma, combined_next_actions, combined_current_actions)
 
 class ReplayBuffer:
     """Fixed-size buffer to store experience tuples."""
