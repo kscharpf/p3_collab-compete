@@ -46,7 +46,7 @@ The critic sees the observations of both agents and the actions of both agents. 
  * future rewards discount gamma set to 0.99
 
 ## Results
-Below we can see that the implementation does indeed solve the problem and does so in 2371 steps.
+Below we can see that the implementation does indeed solve the problem and does so in 2379 steps.
 ![Episode Scores Plot](output/scores.png  "Episode Scores")	
 
 ## Future Work
