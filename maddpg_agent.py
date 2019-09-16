@@ -100,7 +100,7 @@ class MADDPGAgent():
             agent_id = torch.tensor([i]).to(device)
             # next_state is 1x48 - reshape to 2x24 then extract the row with row number agent_id and compress that back to 1x24
             # this is done so that each actor is taking action upon its own observation
-            next_state = next_states.reshape(-1, 2, 24).index_select(1, agent_id).squeeze(1)
+            next_state = next_states.reshape(-1, self.numAgents, self.state_size).index_select(1, agent_id).squeeze(1)
 
             # run the next state for this agent through the target actor to get the action
             combined_next_actions.append(agent.actor_target(next_state))
@@ -111,7 +111,7 @@ class MADDPGAgent():
             agent_id = torch.tensor([i]).to(device)
             # state is 1x48 - reshape to 2x24 then extract the row with row number agent_id and compress that back to 1x24
             # this is done so that each actor is taking action upon its own observation
-            state = states.reshape(-1, 2, 24).index_select(1, agent_id).squeeze(1)
+            state = states.reshape(-1, self.numAgents, self.state_size).index_select(1, agent_id).squeeze(1)
             # run the next state for this agent through the target actor to get the action
             combined_current_actions.append(agent.actor_local(state))
         for i, agent in enumerate(self.agents):
