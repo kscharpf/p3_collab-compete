@@ -11,7 +11,7 @@ def hidden_init(layer):
 
 class Actor(nn.Module):
     """Actor (Policy) Model."""
-    def __init__(self, state_size, action_size, seed, fc1_units=400, fc2_units=300, fc3_units=200, use_batch_norm=True):
+    def __init__(self, state_size, action_size, seed, fc1_units=400, fc2_units=300, use_batch_norm=True):
         """Initialize parameters and build model.
         Params
         ======
@@ -25,12 +25,8 @@ class Actor(nn.Module):
 
         self.seed = torch.manual_seed(seed)
         self.fc1 = nn.Linear(state_size, fc1_units)
-
-        self.bn1 = nn.BatchNorm1d(fc1_units)
-        
         self.fc2 = nn.Linear(fc1_units, fc2_units)
-        self.fc3 = nn.Linear(fc2_units, fc3_units)
-        self.fc4 = nn.Linear(fc3_units, action_size)
+        self.fc3 = nn.Linear(fc2_units, action_size)
 
         self.use_batch_norm = use_batch_norm
         self.reset_parameters()
@@ -38,24 +34,19 @@ class Actor(nn.Module):
     def reset_parameters(self):
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
         self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
-        self.fc3.weight.data.uniform_(*hidden_init(self.fc3))
-        self.fc4.weight.data.uniform_(-3e-3, 3e-3)
+        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
-        if self.use_batch_norm:
-            x = F.selu(self.bn1(self.fc1(state)))
-        else:
-            x = F.selu(self.fc1(state))
-        x = F.selu(self.fc2(x))
-        x = F.selu(self.fc3(x))
-        return F.tanh(self.fc4(x))
+        x = F.relu(self.fc1(state))
+        x = F.relu(self.fc2(x))
+        return F.tanh(self.fc3(x))
 
 
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_size, action_size, seed, fc1_units=400, fc2_units=300, fc3_units=200, use_batch_norm = True):
+    def __init__(self, state_size, action_size, num_agents, seed, fc1_units=400, fc2_units=300, use_batch_norm = True):
         """Initialize parameters and build model.
         Params
         ======
@@ -67,13 +58,11 @@ class Critic(nn.Module):
         """
         super(Critic, self).__init__()
         self.seed = torch.manual_seed(seed)
-        self.fc1 = nn.Linear(state_size, fc1_units)
 
         self.bn1 = nn.BatchNorm1d(fc1_units)
-
-        self.fc2 = nn.Linear(fc1_units+action_size, fc2_units)
-        self.fc3 = nn.Linear(fc2_units, fc3_units)
-        self.fc4 = nn.Linear(fc3_units, 1)
+        self.fc1 = nn.Linear(state_size * num_agents, fc1_units)
+        self.fc2 = nn.Linear(fc1_units + action_size*num_agents , fc2_units)
+        self.fc3 = nn.Linear(fc2_units, 1)
 
         self.use_batch_norm = use_batch_norm
 
@@ -82,16 +71,13 @@ class Critic(nn.Module):
     def reset_parameters(self):
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
         self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
-        self.fc3.weight.data.uniform_(*hidden_init(self.fc3))
-        self.fc4.weight.data.uniform_(-3e-3, 3e-3)
+        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
 
-    def forward(self, state, action):
+    def forward(self, state, actions):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
-        if self.use_batch_norm:
-            xs = F.selu(self.bn1(self.fc1(state)))
-        else:
-            xs = F.selu(self.fc1(state))
-        x = torch.cat((xs, action), dim=1)
-        x = F.selu(self.fc2(x))
-        x = F.selu(self.fc3(x))
-        return self.fc4(x)
+
+        x = self.fc1(state)
+        xs = F.relu(self.bn1(x))
+        x = torch.cat((xs, actions), dim=1)
+        x = F.relu(self.fc2(x))
+        return self.fc3(x)
